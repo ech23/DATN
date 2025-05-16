@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,8 @@ import com.example.ogani.exception.InsufficientStockException;
 import com.example.ogani.exception.NotFoundException;
 import com.example.ogani.model.request.CreateOrderDetailRequest;
 import com.example.ogani.model.request.CreateOrderRequest;
+import com.example.ogani.model.response.OrderDetailResponse;
+import com.example.ogani.model.response.OrderResponse;
 import com.example.ogani.repository.InventoryAdjustmentRepository;
 import com.example.ogani.repository.OrderDetailRepository;
 import com.example.ogani.repository.OrderRepository;
@@ -96,6 +99,7 @@ public class OrderServiceImpl implements OrderService {
         order.setPhone(request.getPhone());
         order.setNote(request.getNote());
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setOrderDate(LocalDateTime.now());
 
         long totalPrice = 0;
         order = orderRepository.save(order);  // Save lần 1 để có ID cho OrderDetail
@@ -220,5 +224,57 @@ public class OrderServiceImpl implements OrderService {
         }
         
         return orderRepository.save(order);
+    }
+
+    @Override
+    public OrderResponse getOrderDetailById(long id) {
+        Order order = getOrderById(id);
+        OrderResponse response = new OrderResponse();
+        
+        // Map Order data to OrderResponse
+        response.setId(order.getId());
+        response.setFirstname(order.getFirstname());
+        response.setLastname(order.getLastname());
+        response.setCountry(order.getCountry());
+        response.setAddress(order.getAddress());
+        response.setTown(order.getTown());
+        response.setState(order.getState());
+        response.setPostCode(order.getPostCode());
+        response.setEmail(order.getEmail());
+        response.setPhone(order.getPhone());
+        response.setNote(order.getNote());
+        response.setTotalPrice(order.getTotalPrice());
+        response.setPaymentStatus(order.getPaymentStatus());
+        response.setOrderStatus(order.getOrderStatus());
+        response.setPaymentMethod(order.getPaymentMethod());
+        response.setOrderDate(order.getOrderDate());
+        response.setUsername(order.getUser() != null ? order.getUser().getUsername() : null);
+        
+        // Get order details and map to response objects
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(order.getId());
+        List<OrderDetailResponse> detailResponses = orderDetails.stream()
+            .map(detail -> {
+                OrderDetailResponse detailResponse = new OrderDetailResponse();
+                detailResponse.setId(detail.getId());
+                detailResponse.setName(detail.getName());
+                detailResponse.setPrice(detail.getPrice());
+                detailResponse.setQuantity(detail.getQuantity());
+                detailResponse.setSubTotal(detail.getSubTotal());
+                
+                if (detail.getProduct() != null) {
+                    detailResponse.setProductId(detail.getProduct().getId());
+                    // Get first image URL if available
+                    if (detail.getProduct().getImages() != null && !detail.getProduct().getImages().isEmpty()) {
+                        detailResponse.setProductImage(detail.getProduct().getImages().iterator().next().getName());
+                    }
+                }
+                
+                return detailResponse;
+            })
+            .collect(Collectors.toList());
+        
+        response.setOrderDetails(detailResponses);
+        
+        return response;
     }
 }

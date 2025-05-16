@@ -1,5 +1,8 @@
 package com.example.ogani.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +23,9 @@ public class RedisConfig {
 
     @Value("${spring.redis.port:6379}")
     private int redisPort;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
@@ -34,6 +40,9 @@ public class RedisConfig {
         
         // Use Jackson serializer for values
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        
+        // Configure serializer with ObjectMapper that has JavaTimeModule
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         
         // Use StringRedisSerializer for keys
         template.setKeySerializer(new StringRedisSerializer());
