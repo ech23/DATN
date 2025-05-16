@@ -3,6 +3,7 @@ package com.example.ogani.controller;
 import com.example.ogani.entity.Order;
 import com.example.ogani.exception.NotFoundException;
 import com.example.ogani.model.payment.PaymentSession;
+import com.example.ogani.model.response.OrderResponse;
 import com.example.ogani.service.OrderService;
 import com.example.ogani.service.VNPayService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,9 @@ public class VNPayController {
     @PostMapping("/create-payment/{orderId}")
     public ResponseEntity<?> createPaymentUrl(@PathVariable long orderId, HttpServletRequest request) {
         try {
-            // Get order by ID
-            Order order = orderService.getOrderById(orderId);
+            // Get order by ID using OrderResponse instead of Order entity
+            OrderResponse orderResponse = orderService.getOrderDetailById(orderId);
+            Order order = orderService.getOrderById(orderId); // Still need the entity for VNPay service
             
             // Create payment session and store order in Redis
             PaymentSession session = vnPayService.createPaymentSession(order);
@@ -96,12 +98,12 @@ public class VNPayController {
     @GetMapping("/payment-status/{orderId}")
     public ResponseEntity<?> getPaymentStatus(@PathVariable long orderId) {
         try {
-            Order order = orderService.getOrderById(orderId);
+            OrderResponse orderResponse = orderService.getOrderDetailById(orderId);
             
             Map<String, String> response = new HashMap<>();
-            response.put("orderId", String.valueOf(order.getId()));
-            response.put("paymentMethod", order.getPaymentMethod());
-            response.put("paymentStatus", order.getPaymentStatus());
+            response.put("orderId", String.valueOf(orderResponse.getId()));
+            response.put("paymentMethod", orderResponse.getPaymentMethod());
+            response.put("paymentStatus", orderResponse.getPaymentStatus());
             
             return ResponseEntity.ok(response);
         } catch (NotFoundException e) {

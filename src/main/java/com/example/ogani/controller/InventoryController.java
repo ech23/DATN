@@ -7,7 +7,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -125,12 +127,18 @@ public class InventoryController {
         }
     }
     
-    @GetMapping("/report")
-    @Operation(summary = "Tạo báo cáo tồn kho")
-    public ResponseEntity<List<InventoryReportItem>> generateInventoryReport() {
-        List<InventoryReportItem> report = inventoryService.generateInventoryReport();
-        return ResponseEntity.ok(report);
-    }
+//    @GetMapping("/report")
+//    @Operation(summary = "Tạo báo cáo tồn kho")
+//    public ResponseEntity<List<InventoryReportItem>> generateInventoryReport(@RequestParam(value = "format", required = false, defaultValue = "json") String format) {
+//        List<InventoryReportItem> report = inventoryService.generateInventoryReport();
+//        byte[] pdfBytes = inventoryService.generateInventoryReportPdf(reportItems);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_PDF);
+//        headers.setContentDispositionFormData("filename", "inventory_report.pdf");
+//
+//        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+//    }
     
     @GetMapping("/report/low-stock")
     @Operation(summary = "Tạo báo cáo sản phẩm có số lượng tồn thấp")

@@ -24,6 +24,7 @@ import com.example.ogani.exception.InsufficientStockException;
 import com.example.ogani.exception.NotFoundException;
 import com.example.ogani.model.request.CreateOrderRequest;
 import com.example.ogani.model.response.MessageResponse;
+import com.example.ogani.model.response.OrderResponse;
 import com.example.ogani.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,6 +107,21 @@ public class OrderController {
     public ResponseEntity<Order> getOrderById(@PathVariable long id) {
         Order order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
+    }
+    
+    @GetMapping("/{id}/details")
+    @Operation(summary="Lấy thông tin chi tiết đơn hàng theo ID và danh sách sản phẩm đã đặt")
+    public ResponseEntity<?> getOrderDetails(@PathVariable long id) {
+        try {
+            OrderResponse orderResponse = orderService.getOrderDetailById(id);
+            return ResponseEntity.ok(orderResponse);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Có lỗi xảy ra: " + e.getMessage()));
+        }
     }
     
     @PostMapping("/{id}/update-payment")
