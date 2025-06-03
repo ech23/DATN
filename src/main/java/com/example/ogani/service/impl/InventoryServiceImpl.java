@@ -69,7 +69,7 @@ public class InventoryServiceImpl implements InventoryService {
     
     @Override
     @Transactional
-    @CacheEvict(value = {"productList", "product"}, allEntries = true)
+    @CacheEvict(value = {"productList", "product", "lowStockProducts"}, allEntries = true)
     public Product adjustProductStock(InventoryAdjustmentRequest request) {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new NotFoundException("Product not found with ID: " + request.getProductId()));

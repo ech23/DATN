@@ -110,7 +110,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable long id){
         productService.deleteProduct(id);
 
-        return ResponseEntity.ok(new MessageResponse("Product is d  elete"));
+        return ResponseEntity.ok(new MessageResponse("Product is delete"));
     }
 
 

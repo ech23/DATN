@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VNPayTransactionRepository extends JpaRepository<VNPayTransaction, Long> {
     VNPayTransaction findByVnpTxnRef(String vnpTxnRef);
+    
+    // Add method to find by order ID
+    VNPayTransaction findByOrderId(Long orderId);
 } 

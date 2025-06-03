@@ -40,4 +40,10 @@ public class CreateUserRequest {
     private String token;
 
     private Set<String> role;
+    private String firstname;
+    private String lastname;
+    private String address;
+    private String phone;
+    private String state;
+    private String country;
 }
